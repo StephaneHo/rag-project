@@ -1,0 +1,21 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Env
+.env
+
+# Logs
+*.log
+
+# Data
+data/
+*.pdf
+
+# Node
+node_modules/
+build/
+
+# OS
+.DS_Store
