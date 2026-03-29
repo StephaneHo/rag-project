@@ -1,9 +1,10 @@
-version: "3.9"
+
 
 services:
 
-
-  # Base de données
+  # -------------------------
+  # Base de données PostgreSQL + pgvector
+  # -------------------------
   db:
     image: pgvector/pgvector:pg16
     container_name: postgres-rag
@@ -16,9 +17,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      # Monte le dossier local ./init-db dans le dossier du conteneur PostgreSQL /docker-entrypoint-initdb.d
-      # Active pgvector au démarrage
-      - ./init-db:/docker-entrypoint-initdb.d 
+      - ./init-db:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d rag"]
       interval: 5s
@@ -27,32 +26,37 @@ services:
     networks:
       - am-net
 
-  # ----- Redis Broker
+  # -------------------------
+  # Redis
+  # -------------------------
   redis:
     image: redis:7-alpine
     container_name: redis-am
     restart: always
     ports:
-    - "6379:6379"
+      - "6379:6379"
     healthcheck:
-      test: ["CMD", "redis-cli","ping"]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 10s
       retries: 5
     networks:
       - am-net
 
+  # -------------------------
+  # Backend (FastAPI)
+  # -------------------------
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
-    ccontainer_name: am-backend
+    container_name: am-backend
     restart: unless-stopped
     env_file: .env
     environment:
-      - DATABASE_URL: postgresql+psycopg2://postgres:postgres:5432/rag
-      - REDIS_URL: redis://redis:6379/0
-    ports: 
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@db:5432/rag
+      REDIS_URL: redis://redis:6379/0
+    ports:
       - "8000:8000"
     depends_on:
       db:
@@ -62,13 +66,15 @@ services:
     networks:
       - am-net
 
-
-
-
+# -------------------------
+# Volumes
+# -------------------------
 volumes:
   postgres_data:
 
-
+# -------------------------
+# Réseau
+# -------------------------
 networks:
   am-net:
     driver: bridge
