@@ -1,6 +1,9 @@
 version: "3.9"
 
 services:
+
+
+  # Base de données
   db:
     image: pgvector/pgvector:pg16
     container_name: postgres-rag
@@ -13,6 +16,59 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      # Monte le dossier local ./init-db dans le dossier du conteneur PostgreSQL /docker-entrypoint-initdb.d
+      # Active pgvector au démarrage
+      - ./init-db:/docker-entrypoint-initdb.d 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d rag"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - am-net
+
+  # ----- Redis Broker
+  redis:
+    image: redis:7-alpine
+    container_name: redis-am
+    restart: always
+    ports:
+    - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      - am-net
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    ccontainer_name: am-backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - DATABASE_URL: postgresql+psycopg2://postgres:postgres:5432/rag
+      - REDIS_URL: redis://redis:6379/0
+    ports: 
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - am-net
+
+
+
 
 volumes:
   postgres_data:
+
+
+networks:
+  am-net:
+    driver: bridge
