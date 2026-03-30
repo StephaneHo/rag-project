@@ -34,3 +34,12 @@ Test 2 — Extension pgvector active
 docker compose exec db psql -U postgres -d rag -c "SELECT extname FROM pg_extension WHERE extname='vector';"
 
 ## Migraations Alembic - création des tables
+
+# Vérifier que les tables ont bien été crées
+docker compose exec db psql -U postgres -d rag -c "\dt"
+les tables doivent bien apparaitre
+
+# Vérifier que la colonne embedding doit apparaitre avec le bon type Vector(384) 
+docker compose exec db psql -U postgres -d rag -c "\d papers"
+on doit avoir 
+embedding           | vector(384)   
