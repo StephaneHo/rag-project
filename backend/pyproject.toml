@@ -15,6 +15,7 @@ dependencies = [
     "requests>=2.33.0",
     "sentence-transformers>=5.3.0",
     "sqlalchemy>=2.0.48",
+    "tenacity>=9.1.4",
     "transformers>=5.4.0",
     "uvicorn>=0.42.0",
 ]
