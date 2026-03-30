@@ -80,16 +80,29 @@ class ArxivCollector:
                 "doi": result.doi,  # identifiant scientfique si dispo
                 "published_at": result.published,
                 "updated_at": result.updated,
-                "authors": [  # on va tranformer un objet complexe en un objet JSON
+                "authors": [
                     {
-                        "name": a.name,
-                        "affiliation": a.affiliations[0] if a.affiliations else None,
+                        "name": getattr(a, "name", None),
                     }
-                    for a in result.authors
+                    for a in (getattr(result, "authors", []) or [])
+                    if getattr(a, "name", None)
                 ],
                 "categories": result.categories,  # catégories scientifiques
                 "github_urls": self._extract_github_urls(result.comment or ""),
             }
         except Exception as ex:
             logger.warning(f"[ArXiv] Normalisation échouée: {ex}")
-            return None
+            logger.warning("solution de fallback")
+            return {
+                "arxiv_id": getattr(result, "entry_id", None),
+                "title": None,
+                "abstract": None,
+                "pdf_url": None,
+                "html_url": getattr(result, "entry_id", None),
+                "doi": None,
+                "published_at": None,
+                "updated_at": None,
+                "authors": [],
+                "categories": [],
+                "github_urls": [],
+            }
