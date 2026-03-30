@@ -21,7 +21,7 @@ CREATE TABLE + INDEX + EXTENSIONS
 uvicorn FastAPI
 
 
-# Validation de l'architecture
+### Etape 1: Validation de l'architecture
 
 ## Docker Compose PostgreSQL + pgvector
 docker compose up db -d
@@ -33,7 +33,7 @@ docker compose exec db psql -U postgres -d rag -c "\conninfo"
 Test 2 — Extension pgvector active
 docker compose exec db psql -U postgres -d rag -c "SELECT extname FROM pg_extension WHERE extname='vector';"
 
-## Migraations Alembic - création des tables
+### Etape 2: Migraations Alembic - création des tables
 
 # Vérifier que les tables ont bien été crées
 docker compose exec db psql -U postgres -d rag -c "\dt"
@@ -43,3 +43,5 @@ les tables doivent bien apparaitre
 docker compose exec db psql -U postgres -d rag -c "\d papers"
 on doit avoir 
 embedding           | vector(384)   
+
+### Etape 3: tester le collecteur ArXiv de façon isolée 
