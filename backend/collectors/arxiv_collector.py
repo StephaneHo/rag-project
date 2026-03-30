@@ -5,6 +5,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 import re
 from datetime import datetime, timedelta, timezone
 from loguru import logger
+import time
 
 
 class ArxivCollector:
@@ -52,7 +53,12 @@ class ArxivCollector:
                 if normalized:
                     yield normalized
                     count += 1
-                logger.info(f"[ArXiv] {count} articles for category {cat}")
+            logger.info(f"[ArXiv] {count} articles for category {cat}")
+            time.sleep(self._DELAY_SECONDS)
+
+    def collect_by_id(self, arxiv_ids: list[str]) -> list[dict]:
+        search = arxiv.Search(id_list=arxiv_ids)
+        return [self._normalize(r) for r in self.client.results(search) if r]
 
     # temps d’attente entre les essais : 2s, 4s, 10s
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=2, max=10))

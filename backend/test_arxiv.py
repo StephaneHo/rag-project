@@ -5,3 +5,4 @@ collector = ArxivCollector()
 print("Test 1, collecte cs.AI sur 2 jours")
 papers = list(collector.collect(categories=["cs.AI"], days_back=2))
 print(f"articles collectés: {len(papers)}")
+assert len(papers) > 0, "On devrait avoir récupéré un article"
