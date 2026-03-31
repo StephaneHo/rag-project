@@ -47,3 +47,4 @@ embedding           | vector(384)
 ### Etape 3: Collecte des articles ArXiv en mémoire et test du collecteur ArXiv de façon isolée 
 
 ### Etape 4  Branche la collecte sur PostgreSQL : les articles sont vectorisés (embedding) et stockés en base
+
