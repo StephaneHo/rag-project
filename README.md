@@ -44,4 +44,6 @@ docker compose exec db psql -U postgres -d rag -c "\d papers"
 on doit avoir 
 embedding           | vector(384)   
 
-### Etape 3: tester le collecteur ArXiv de façon isolée 
+### Etape 3: Collecte des articles ArXiv en mémoire et test du collecteur ArXiv de façon isolée 
+
+### Etape 4  Branche la collecte sur PostgreSQL : les articles sont vectorisés (embedding) et stockés en base
