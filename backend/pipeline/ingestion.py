@@ -21,9 +21,8 @@ class PaperIngestionPipeline:
         self.embedder = SentenceTransformer(settings.EMBEDDING_MODEL)
         logger.info("[Pipeline] Modèle chargé")
 
-    """Lance la collecte complète. Retourne le nombre d'articles traités."""
-
     def run(self, categories: Optional[list[str]] = None, days_back: int = 7) -> int:
+        """Lance la collecte complète. Retourne le nombre d'articles traités."""
         logger.info(
             f"[Démarrage de la pipeline] - categories={categories} jours={days_back}"
         )
@@ -45,12 +44,11 @@ class PaperIngestionPipeline:
         logger.info(f"[Pipeline] terminé - {total} articles ingérés")
         return total
 
-    """
-    Génère un vecteur normalisé 
-    """
-
     def _embed(self, text: str) -> list[float]:
-        return self.embedder.encoder(
+        """
+        Génère un vecteur normalisé
+        """
+        return self.embedder.encode(
             text[:1024], normalize_embeddings=True, show_progress_bar=False
         ).tolist()
 
@@ -74,9 +72,9 @@ class PaperIngestionPipeline:
             )
             .on_conflict_do_update(
                 index_elements=["arxiv_id"],
-                set={
+                set_={
                     "title": raw["title"],
-                    "abtract": raw.get("abstract"),
+                    "abstract": raw.get("abstract") or "",
                     "updated_at": raw.get("updated_at"),
                     "embedding": raw.get("embedding"),
                 },
@@ -91,5 +89,5 @@ class PaperIngestionPipeline:
         embedding = self._embed(raw["title"] + " " + abstract)
 
         paper = self._insert_or_update_paper(raw, embedding)
-        self._insert_or_update_paper(paper, raw.get("authors", []))
-        self._insert_or_update_paper(paper, raw.get("categories", []))
+        # self._insert_or_update_authors(paper, raw.get("authors", []))
+        # self._insert_or_update_categories(paper, raw.get("categories", []))

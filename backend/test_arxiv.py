@@ -9,6 +9,8 @@ assert len(papers) > 0, "On devrait avoir récupéré un article"
 
 print("Test 2, champs obligatoires présents")
 p = papers[0]
+
+
 assert p["arxiv_id"], "arxiv_id manquant"
 assert p["title"], "titre manquant"
 assert p["abstract"], "abstract manquant"
