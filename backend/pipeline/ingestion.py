@@ -1,11 +1,12 @@
 from loguru import logger
 from sqlalchemy.orm import Session
-from sqlalchemy import settings
+from config import settings
+from sqlalchemy.dialects.postgresql import insert
 from collectors.arxiv_collector import ArxivCollector
 from sentence_transformers import SentenceTransformer
 
-from config import settings
 from typing import Optional
+from database.models import Paper
 
 
 class PaperIngestionPipeline:
@@ -44,5 +45,51 @@ class PaperIngestionPipeline:
         logger.info(f"[Pipeline] terminé - {total} articles ingérés")
         return total
 
+    """
+    Génère un vecteur normalisé 
+    """
+
+    def _embed(self, text: str) -> list[float]:
+        return self.embedder.encoder(
+            text[:1024], normalize_embeddings=True, show_progress_bar=False
+        ).tolist()
+
+    def _insert_or_update_paper(self, raw: dict, embedding: list[float]) -> Paper:
+        """
+        raw[quelque chose] => accès strict (erreur si non présent),
+        raw.get(quelque chose) => accès flexible, retourne None si la clé n'existe pas
+        """
+        statement = (
+            insert(Paper)
+            .values(
+                arxiv_id=raw["arxiv_id"],
+                title=raw["title"],
+                abstract=raw.get("abstract"),
+                pdf_url=raw.get("pdf_url"),
+                html_url=raw.get("html_url"),
+                doi=raw.get("doi"),
+                published_at=raw.get("published_at"),
+                updated_at=raw.get("updated_at"),
+                embedding=embedding,
+            )
+            .on_conflict_do_update(
+                index_elements=["arxiv_id"],
+                set={
+                    "title": raw["title"],
+                    "abtract": raw.get("abstract"),
+                    "updated_at": raw.get("updated_at"),
+                    "embedding": raw.get("embedding"),
+                },
+            )
+        )
+        self.session.execute(statement)
+        return self.session.get(Paper, raw["arxiv_id"])
+
     def _process_paper(self, raw: dict) -> None:
-        pass
+        abstract = raw.get("abstract")
+        """ On va mettre dans l'embedding à la fois le titre et l'abstract"""
+        embedding = self._embed(raw["title"] + " " + abstract)
+
+        paper = self._insert_or_update_paper(raw, embedding)
+        self._insert_or_update_paper(paper, raw.get("authors", []))
+        self._insert_or_update_paper(paper, raw.get("categories", []))
