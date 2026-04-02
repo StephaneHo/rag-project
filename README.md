@@ -1,3 +1,37 @@
+### Pour démarrer
+
+docker compose up -d (mode détaché => en arrière plan)
+
+
+
+paper représente l’article entier (une ligne en base) :
+
+Typiquement :
+paper = {
+    "arxiv_id": "...",
+    "title": "...",
+    "abstract": "...",
+    "date": "...",
+}
+Abstract complet :
+"Transformers are very powerful models. They are used in NLP..."
+
+Chunks :
+C'est le morceau de document (page ou pargraphe)
+Par exemple:
+"Transformers are very powerful models."
+"They are used in NLP..."
+
+Chaque chunk devient une entrée séparée en base :
+
+chunk = {
+    "paper_id": paper.arxiv_id,
+    "text": "...",
+    "embedding": [...]
+}
+
+
+
 # docker compose up
 V"rifier que :database system is ready to accept connections
 

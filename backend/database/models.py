@@ -21,13 +21,21 @@ from pgvector.sqlalchemy import Vector
 
 from config import settings
 
+"""
+classe de base pour tous les modèles
+DeclarativeBase transforme les classes Python en tables SQL
+"""
+
 
 class Base(DeclarativeBase):
     pass
 
 
-# ── Tables d'association many-to-many ─────────────────────────────────────────
-
+"""
+Many to many
+un paper peut avoir plusieurs auteurs
+un auteur a plusieurs papers
+"""
 paper_author = Table(
     "paper_author",
     Base.metadata,
@@ -35,6 +43,11 @@ paper_author = Table(
     Column("author_id", Integer, ForeignKey("authors.id"), primary_key=True),
 )
 
+"""
+Many to Many
+un paper peut avoir plusieurs catégories
+une catégorie peut faire référence à plusieurs papers
+"""
 paper_category = Table(
     "paper_category",
     Base.metadata,
@@ -42,15 +55,17 @@ paper_category = Table(
     Column("category_id", Integer, ForeignKey("categories.id"), primary_key=True),
 )
 
+"""
+Many to many
+un paper peut faire référence à plusieurs conférences
+une conférence peut faire mention de plusieurs papers
+"""
 paper_conference = Table(
     "paper_conference",
     Base.metadata,
     Column("paper_id", String(64), ForeignKey("papers.arxiv_id"), primary_key=True),
     Column("conference_id", Integer, ForeignKey("conferences.id"), primary_key=True),
 )
-
-
-# ── Modèles principaux ────────────────────────────────────────────────────────
 
 
 class Paper(Base):
@@ -75,20 +90,33 @@ class Paper(Base):
         Vector(settings.EMBEDDING_DIM), nullable=True
     )
 
-    # Relations
+    """ many to many avec les auteurs """
     authors: Mapped[List["Author"]] = relationship(
         "Author", secondary=paper_author, back_populates="papers"
     )
+    """many to many avec les catégories"""
     categories: Mapped[List["Category"]] = relationship(
         "Category", secondary=paper_category, back_populates="papers"
     )
+    """many to many avec les conférences"""
     conferences: Mapped[List["Conference"]] = relationship(
         "Conference", secondary=paper_conference, back_populates="papers"
     )
+    """one to many: un paper peut avoir plusieurs repos mais un repo n'est en principe que dédidé à un paper"""
     github_repos: Mapped[List["GitHubRepo"]] = relationship(
         "GitHubRepo", back_populates="paper"
     )
+    """
+       one-to-many: un papier peut faire référence à plusieurs modèles
+       on introduit une simplification: on ne modélise pas un modèle HF peut être cité dans plusieurs papers 
+       théoriquement ce serait du many-to-many, mais on simplifie en supposant que un modèle HF est associé à un seul Paper
+       on veut juste afficher les modèles liés au Paper et pas besoin de mutualiser les modèles
+    """
     hf_models: Mapped[List["HFModel"]] = relationship("HFModel", back_populates="paper")
+    """
+        one-to-many: pas d'ambiguités ici
+        si on supprime un paper, on supprime tous les chunks associés et en plus, on veut que un chunk ne soit pas relié à rien
+    """
     chunks: Mapped[List["PaperChunk"]] = relationship(
         "PaperChunk", back_populates="paper", cascade="all, delete-orphan"
     )
@@ -137,7 +165,7 @@ class Conference(Base):
     url: Mapped[Optional[str]] = mapped_column(String(512))
 
     papers: Mapped[List["Paper"]] = relationship(
-        "Paper", secondary=paper_conference, back_populates="papers"
+        "Paper", secondary=paper_conference, back_populates="conferences"
     )
 
 
