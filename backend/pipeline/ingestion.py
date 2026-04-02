@@ -4,7 +4,7 @@ from config import settings
 from sqlalchemy.dialects.postgresql import insert
 from collectors.arxiv_collector import ArxivCollector
 from sentence_transformers import SentenceTransformer
-
+import torch
 from typing import Optional
 from database.models import Paper, Author, Category, PaperChunk
 
@@ -28,14 +28,21 @@ class PaperIngestionPipeline:
         self.embedder = SentenceTransformer(settings.EMBEDDING_MODEL)
         logger.info("[Pipeline] Modèle chargé")
 
-    def run(self, categories: Optional[list[str]] = None, days_back: int = 7) -> int:
+    def run(
+        self,
+        categories: Optional[list[str]] = None,
+        days_back: int = 7,
+        max_results: int | None = None,
+    ) -> int:
         """Lance la collecte complète. Retourne le nombre d'articles traités."""
         logger.info(
-            f"[Démarrage de la pipeline] - categories={categories} jours={days_back}"
+            f"[Démarrage de la pipeline] - categories={categories} jours={days_back} nb_max de papers retournés={max_results}"
         )
         total = 0
 
-        for raw in self.arxiv.collect(categories=categories, days_back=days_back):
+        for raw in self.arxiv.collect(
+            categories=categories, days_back=days_back, max_results=max_results
+        ):
             try:
                 self._process_paper(raw)
                 total += 1
@@ -55,10 +62,12 @@ class PaperIngestionPipeline:
         """
         Génère un vecteur normalisé
         On tronque à 1024 caractères
+        torch.no_grad() désactive le calcul des gradients
         """
-        return self.embedder.encode(
-            text[:1024], normalize_embeddings=True, show_progress_bar=False
-        ).tolist()
+        with torch.no_grad():
+            return self.embedder.encode(
+                text[:1024], normalize_embeddings=True, show_progress_bar=False
+            ).tolist()
 
     def _insert_or_update_paper(self, raw: dict, embedding: list[float]) -> Paper:
         """
@@ -166,7 +175,7 @@ class PaperIngestionPipeline:
             )
 
     def _process_paper(self, raw: dict) -> None:
-        abstract = raw.get("abstract")
+        abstract = raw.get("abstract") or ""
         """ On va mettre dans l'embedding à la fois le titre et l'abstract"""
         embedding = self._embed(raw["title"] + " " + abstract)
 
