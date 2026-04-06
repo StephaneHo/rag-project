@@ -82,3 +82,37 @@ embedding           | vector(384)
 
 ### Etape 4  Branche la collecte sur PostgreSQL : les articles sont vectorisés (embedding) et stockés en base
 
+### Pour voir les tables
+
+Se connecter au conteneur PostgreSQL
+ docker compose exec db psql -U postgres -d rag
+
+On est maintenant dans le shell PostgreSQL. Voici les commandes utiles :
+
+ -- Lister toutes les tables
+\dt
+
+-- Voir la structure d'une table
+\d papers
+\d paper_chunks
+\d authors
+
+-- Voir le contenu
+SELECT * FROM alembic_version;
+SELECT count(*) FROM papers;
+SELECT arxiv_id, LEFT(title, 60) AS title FROM papers LIMIT 5;
+(si on fait SELECT arxiv_id, title FROM papers LIMIT 5; on rsique de ne rien voir car le terminal ne sera pas assez large)
+SELECT count(*) FROM paper_chunks;
+
+-- Quitter
+\q
+
+
+### Pour tester le RAG
+
+# Terminal 1
+cd backend
+uv run uvicorn api.app:app --reload --port 8000
+
+# Terminal 2 — une fois uvicorn démarré
+uv run python test_rag.py

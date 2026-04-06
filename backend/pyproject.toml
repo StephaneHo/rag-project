@@ -10,6 +10,7 @@ dependencies = [
     "arxiv>=2.1.0",
     "fastapi>=0.135.2",
     "loguru>=0.7.3",
+    "openai>=2.30.0",
     "pgvector>=0.4.2",
     "psycopg2-binary>=2.9.11",
     "pydantic-settings>=2.13.1",

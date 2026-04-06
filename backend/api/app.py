@@ -8,9 +8,19 @@ from database.db import get_db
 from database.models import Paper, Category
 from sqlalchemy import extract
 from sqlalchemy.orm import Session
+from rag.rag_engine import RAGEngine
+from pydantic import BaseModel, Field
 
 
 app = FastAPI(title="Veille scientifique", version="1.0.0")
+
+
+class SearchRequest(BaseModel):
+    query: str = Field(..., min_length=3)
+    top_k: int = Field(5, ge=1, le=20)
+    year_from: Optional[int] = None
+    categories: Optional[list[str]] = None
+
 
 """
 Pour l'instant, tout le monde peut appler l'API
@@ -78,3 +88,25 @@ async def get_paper(arxiv_id: str, db: Session = Depends(get_db)):
     if not paper:
         raise HTTPException(status_code=404, detail="Article non trouvé")
     return _paper_convert_to_json(paper)
+
+
+def get_rag(db: Session = Depends(get_db)) -> RAGEngine:
+    return RAGEngine(session=db)
+
+
+@app.post("/rag/search", tags=["RAG"])
+async def rag_search(
+    req: SearchRequest,
+    engine: RAGEngine = Depends(get_rag),
+):
+    """Recherche sémantique et génération de réponse."""
+    r = engine.answer(
+        query=req.query,
+        top_k=req.top_k,
+        year_from=req.year_from,
+    )
+    return {
+        "answer": r.answer,
+        "references": r.references,
+        "tokens_used": r.tokens_used,
+    }

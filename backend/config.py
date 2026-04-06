@@ -30,6 +30,11 @@ class Settings(BaseSettings):
     RAG_CHUNK_OVERLAP: int = 64  # recouvrement des chunks, éviter  que les infromations importantes soit coupées en deux
     RAG_TEMPERATURE: float = 0.2  # faible température => strict
 
+    OPENAI_API_KEY: str = ""
+    ANTHROPIC_API_KEY: str = ""
+    LLM_PROVIDER: str = "openai"
+    LLM_MODEL: str = "gpt-4o-mini"
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
