@@ -5,11 +5,11 @@ type PaperCardProps = {
 }
 
  export const PaperCard = ({paper}: PaperCardProps) => (
-             <article>
-                <h2>titre:{paper.title}</h2>
-                <time>date: {paper.published_at}</time>
-                <p>abstract : {paper.abstract}</p>
-                {paper.venue && <p>conférence: {paper.venue}</p>}
+             <article className="bg-white border rounded-lg shadow p-4 space-y-2">
+                <h2 className="text-xl font-bold">{paper.title}</h2>
+                <time className="text-sm text-gray-500">{paper.published_at}</time>
+                <p>{paper.abstract}</p>
+                {paper.venue && <p>Publié dans: {paper.venue}</p>}
                 {paper.citation_count != null && <p>nombre de citations: {paper.citation_count}</p>}
             </article>    
         )
