@@ -1,17 +1,20 @@
 
+import NavBar from './components/NavBar'
 import PaperDetailPage from './pages/PaperDetailPage'
 import PapersListPage from './pages/PapersListPage'
 import SearchPage from './pages/SearchPage'
-
 import { Route, Routes } from 'react-router'
 function App() {
 
   return (
-    <Routes>
-     <Route path="/" element={<PapersListPage/>} />
-     <Route path="/papers/:arxiv_id" element={<PaperDetailPage/>} />
-     <Route path="/search" element={<SearchPage/>} />
-    </Routes>
+    <>
+      <NavBar />
+      <Routes>
+        <Route path="/" element={<PapersListPage/>} />
+        <Route path="/papers/:arxiv_id" element={<PaperDetailPage/>} />
+        <Route path="/search" element={<SearchPage/>} />
+      </Routes>
+    </>
   )
 }
 
