@@ -107,12 +107,61 @@ SELECT count(*) FROM paper_chunks;
 -- Quitter
 \q
 
+# Lancement des tests
 
-### Pour tester le RAG
+## Collecte des données
 
-# Terminal 1
+Prérequis:
+Rien de Docker — pas besoin de PostgreSQL ni Redis
+Juste une connexion internet (pour appeler l'API ArXiv)
+
+cd backend
+uv run python test_arxiv.py
+
+## Test du pipeline complet ArXiv → embedding → PostgreSQL.
+
+Prérequis :
+Docker Desktop lancé
+Conteneur db démarré
+Connexion internet (ArXiv)
+
+### Terminal 1 — démarrer PostgreSQL
+docker compose up db -d
+
+### Vérifier qu'il tourne
+docker compose ps
+
+### Terminal 2 — lancer le test
+cd backend
+uv run python test_ingestion.py
+
+## Test des endpoints FastAPI /health, /papers
+
+Prérequis :
+Docker Desktop lancé
+Conteneur db démarré (avec des données dedans)
+uvicorn qui tourne dans un terminal séparé
+
+### Terminal 1 — PostgreSQL
+docker compose up db -d
+
+### Terminal 2 — uvicorn
 cd backend
 uv run uvicorn api.app:app --reload --port 8000
 
-# Terminal 2 — une fois uvicorn démarré
+### Terminal 3 — test (une fois uvicorn prêt)
+cd backend
+uv run python test_api.py
+
+## Pour tester le RAG complet (retrieval + LLM)
+
+### Terminal 1 — PostgreSQL
+docker compose up db -d
+
+### Terminal 2
+cd backend
+uv run uvicorn api.app:app --reload --port 8000
+
+### Terminal 3 — une fois uvicorn démarré
 uv run python test_rag.py
+
