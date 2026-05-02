@@ -5,7 +5,6 @@ import PapersListPage from './pages/PapersListPage'
 import SearchPage from './pages/SearchPage'
 import { Route, Routes } from 'react-router'
 function App() {
-
   return (
     <>
       <NavBar />
