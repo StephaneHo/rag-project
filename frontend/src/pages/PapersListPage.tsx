@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchPapers } from "../api/papers";
 import { PaperCard } from "../components/PaperCard";
 import type { Paper } from "../types/paper";
+import { Link } from "react-router";
 
 export default function PapersListPage(){
 
@@ -17,9 +18,13 @@ export default function PapersListPage(){
         <>
         <h1 className="text-2xl font-bold p-4">Papers</h1>
         <div className="max-w-3xl mx-auto p-4 space-y-4">{data.map((paper: Paper) => 
-            
-                <PaperCard key={paper.arxiv_id} paper={paper}/> 
-            
+                <Link 
+                    key={paper.arxiv_id} 
+                    to={`/papers/${paper.arxiv_id}`} 
+                    className="block no-underline text-inherit"
+                >
+                    <PaperCard paper={paper}/> 
+                </Link>
         )}
         </div>
         </>)

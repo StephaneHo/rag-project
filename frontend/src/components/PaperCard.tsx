@@ -10,6 +10,6 @@ type PaperCardProps = {
                 <time className="text-sm text-gray-500">{paper.published_at}</time>
                 <p>{paper.abstract}</p>
                 {paper.venue && <p>Publié dans: {paper.venue}</p>}
-                {paper.citation_count != null && <p>nombre de citations: {paper.citation_count}</p>}
+                {paper.citation_count != null && <p>Nombre de citations: {paper.citation_count}</p>}
             </article>    
         )

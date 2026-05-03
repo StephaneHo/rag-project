@@ -1,4 +1,4 @@
-import type { Paper } from "../../types/paper";
+import type { Paper } from "../types/paper";
 
 export const mockPapers: Paper[] = [{
     arxiv_id:"1234",

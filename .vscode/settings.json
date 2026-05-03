@@ -1,3 +1,23 @@
 {
-  "python.analysis.extraPaths": ["./backend"]
+  "python.analysis.extraPaths": ["./backend"],
+
+  "problems.autoReveal": false,
+  "problems.showCurrentInStatus": false,
+
+  "testing.openTesting": "neverOpen",
+  "testing.automaticallyOpenTestResults": "neverOpen",
+  "testing.automaticallyOpenPeekView": "never",
+
+  "git.autofetch": false,
+  "git.confirmSync": false,
+
+  "extensions.ignoreRecommendations": true,
+  "workbench.tips.enabled": false,
+  "workbench.welcomePage.walkthroughs.openOnInstall": false,
+
+  "editor.linkedEditing": true,
+  "editor.formatOnSave": false,
+
+  "typescript.surveys.enabled": false,
+  "telemetry.telemetryLevel": "off"
 }
