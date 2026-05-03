@@ -94,8 +94,24 @@ describe('SearchPage', () => {
             expect(await screen.findByText(/Recherche en cours/i)).toBeInTheDocument()
 
         })
-    })
 
+
+        it('affiche un message d\'erreur si la recherche échoue', async () => {
+            const user = userEvent.setup()
+            searchRagMock.mockRejectedValueOnce(new Error('Backend indisponible'))
+
+            renderWithProviders(<SearchPage />, { route: '/search', path: '/search' })
+
+            const input = screen.getByPlaceholderText(/Votre question/i)
+            const button = screen.getByRole('button', { name: /rechercher/i })
+
+            await user.type(input, 'What is the state of ML today ?')
+            await user.click(button)
+
+            expect(await screen.findByText(/Backend indisponible/i)).toBeInTheDocument()
+
+        })
+    })
 
 
 })

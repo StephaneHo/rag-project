@@ -39,6 +39,7 @@ export default function SearchPage() {
         </button>
       </form>
       {mutation.isPending && <p>Recherche en cours...</p>}
+      {mutation.isError && <p className="text-red-500">{mutation.error.message}</p>}
       {mutation.data && <p>{mutation.data.answer}</p>}
     </>
   )
