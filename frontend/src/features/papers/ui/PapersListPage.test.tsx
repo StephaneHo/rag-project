@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '../test/renderWithProviders'
 import PapersListPage from './PapersListPage'
+import { renderWithProviders } from '../../../shared/test/renderWithProviders'
 
 describe('PapersListPage (intégration MSW)', () => {
     it('affiche la liste des papers depuis l\'API', async () => {

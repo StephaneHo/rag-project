@@ -1,15 +1,15 @@
 
-import NavBar from './components/NavBar'
 
 import { Route, Routes } from 'react-router'
 
 import { lazy, Suspense } from 'react'
+import NavBar from './shared/ui/NavBar'
 
 
 
-const PapersListPage = lazy(() => import('./pages/PapersListPage'))
-const PaperDetailPage = lazy(() => import('./pages/PaperDetailPage'))
-const SearchPage = lazy(() => import('./pages/SearchPage'))
+const PapersListPage = lazy(() => import('./features/papers/ui/PapersListPage'))
+const PaperDetailPage = lazy(() => import('./features/papers/ui/PaperDetailPage'))
+const SearchPage = lazy(() => import('./features/rag/ui/SearchPage'))
 
 function App() {
   return (

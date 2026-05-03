@@ -1,10 +1,10 @@
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '../test/renderWithProviders'
 import SearchPage from './SearchPage'
 import userEvent from '@testing-library/user-event'
 import { vi } from 'vitest'
 import { waitFor } from '@testing-library/react'
 import { searchRag } from '../api/rag'
+import { renderWithProviders } from '../../../shared/test/renderWithProviders'
 
 vi.mock('../api/rag', () => ({
     searchRag: vi.fn().mockResolvedValue({
