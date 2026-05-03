@@ -14,11 +14,11 @@ type FormData = z.infer<typeof schema>
 
 export default function SearchPage() {
 
-    const mutation = useMutation({
+  const mutation = useMutation({
     mutationFn: searchRag,
-    })
-    
-  const { register, handleSubmit, formState: {errors} } = useForm<FormData>({
+  })
+
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema)
   })
 
@@ -27,11 +27,20 @@ export default function SearchPage() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-        <input {...register('query')} placeholder='Votre question...' className='border p-2 rounded'/>
+    <>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <input {...register('query')} placeholder='Votre question...' className='border p-2 rounded' />
         {errors.query && <p className="text-red-500 text-sm">{errors.query.message}</p>}
-        <button type="submit" onSubmit={onSubmit} className='bg-blue-500 text-white px-4 py-2 rounded'>Rechercher</button> 
-    </form>
+        <button
+          type="submit"
+          className='bg-blue-500 text-white px-4 py-2 rounded'
+          disabled={mutation.isPending}>
+          {mutation.isPending ? 'Recherche...' : 'Rechercher'}
+        </button>
+      </form>
+      {mutation.isPending && <p>Recherche en cours...</p>}
+      {mutation.data && <p>{mutation.data.answer}</p>}
+    </>
   )
 }
 
