@@ -1,3 +1,37 @@
-export default function SearchPage(){
-    return <h1 className="text-2xl font-bold p-4">SearchPage</h1>
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
+import { searchRag } from '../api/rag'
+
+const schema = z.object({
+  query: z.string().min(3, 'Minimum 3 caractères'),
+})
+
+
+
+type FormData = z.infer<typeof schema>
+
+export default function SearchPage() {
+
+    const mutation = useMutation({
+    mutationFn: searchRag,
+    })
+    
+  const { register, handleSubmit, formState: {errors} } = useForm<FormData>({
+    resolver: zodResolver(schema)
+  })
+
+  const onSubmit = (data: FormData) => {
+    mutation.mutate(data)
+  }
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+        <input {...register('query')} placeholder='Votre question...' className='border p-2 rounded'/>
+        {errors.query && <p className="text-red-500 text-sm">{errors.query.message}</p>}
+        <button type="submit" onSubmit={onSubmit} className='bg-blue-500 text-white px-4 py-2 rounded'>Rechercher</button> 
+    </form>
+  )
 }
+
