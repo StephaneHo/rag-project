@@ -1,4 +1,5 @@
 
+import { Link } from 'react-router'
 import { useRagSearch } from '../hooks/useRagSearch'
 
 export default function SearchPage() {
@@ -20,7 +21,18 @@ export default function SearchPage() {
       </form>
       {mutation.isPending && <p>Recherche en cours...</p>}
       {mutation.isError && <p className="text-red-500">{mutation.error.message}</p>}
-      {mutation.data && <p>{mutation.data.answer}</p>}
+      {mutation.data && (
+        <>
+          <p>{mutation.data.answer}</p>
+          <h2>Références</h2>
+          {mutation.data.references.map((reference) => (
+            <div key={reference.arxiv_id}>
+              <Link to={`/papers/${reference.arxiv_id}`}>{reference.title}</Link>
+            </div>
+          ))}
+        </>
+      )
+      }
     </>
   )
 }

@@ -111,7 +111,44 @@ describe('SearchPage', () => {
             expect(await screen.findByText(/Backend indisponible/i)).toBeInTheDocument()
 
         })
+
+
+        it('affiche les références cliquables après recherche réussie', async () => {
+            const user = userEvent.setup()
+
+            searchRagMock.mockResolvedValueOnce({
+                answer: 'test answer',
+                references: [
+                    {
+                        arxiv_id: '1234', title: 'Paper One', published_at: null, venue: null,
+                        url: 'https://arxiv.org/abs/1234', score: 0.9
+                    },
+                    {
+                        arxiv_id: '5678', title: 'Paper Two', published_at: null, venue: null,
+                        url: 'https://arxiv.org/abs/5678', score: 0.8
+                    },
+                ],
+                tokens_used: 100,
+            })
+
+            renderWithProviders(<SearchPage />, { route: '/search', path: '/search' })
+
+            const input = screen.getByPlaceholderText(/Votre question/i)
+            const button = screen.getByRole('button', { name: /rechercher/i })
+
+            await user.type(input, 'What is the state of ML today ?')
+            await user.click(button)
+
+            await screen.findByText('Paper One')
+            screen.getByText('Paper Two')
+
+            const link = screen.getByText('Paper One').closest('a')
+            expect(link).toHaveAttribute('href', '/papers/1234')
+        })
+
+
     })
+
 
 
 })
