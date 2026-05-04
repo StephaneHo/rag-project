@@ -10,7 +10,13 @@ export default function SearchPage() {
   return (
     <>
       <form onSubmit={onSubmit}>
-        <input {...register('query')} placeholder='Votre question...' className='border p-2 rounded' />
+        <label htmlFor="search-query" className='block mb-1 text-sm font-medium'>Votre question</label>
+        <input
+          id="search-query"
+          {...register('query')}
+          placeholder='Votre question...'
+          className='border p-2 rounded'
+        />
         {errors.query && <p className="text-red-500 text-sm">{errors.query.message}</p>}
         <button
           type="submit"

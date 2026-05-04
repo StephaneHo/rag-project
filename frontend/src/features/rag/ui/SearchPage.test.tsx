@@ -6,6 +6,10 @@ import { waitFor } from '@testing-library/react'
 import { searchRag } from '../api/rag'
 import { renderWithProviders } from '../../../shared/test/renderWithProviders'
 
+import { axe } from 'vitest-axe'
+
+
+
 vi.mock('../api/rag', () => ({
     searchRag: vi.fn().mockResolvedValue({
         answer: 'test answer',
@@ -120,11 +124,11 @@ describe('SearchPage', () => {
                 answer: 'test answer',
                 references: [
                     {
-                        arxiv_id: '1234', title: 'Paper One', published_at: null, venue: null,
+                        arxiv_id: '1234', title: 'Paper One', published_at: '2023-12-12T00:00:00Z', venue: null,
                         url: 'https://arxiv.org/abs/1234', score: 0.9
                     },
                     {
-                        arxiv_id: '5678', title: 'Paper Two', published_at: null, venue: null,
+                        arxiv_id: '5678', title: 'Paper Two', published_at: '2023-12-12T00:00:00Z', venue: null,
                         url: 'https://arxiv.org/abs/5678', score: 0.8
                     },
                 ],
@@ -147,6 +151,23 @@ describe('SearchPage', () => {
         })
 
 
+    })
+
+    describe('accessibilité (a11y)', () => {
+        it("n'a pas de violation a11y au render initial", async () => {
+
+            const { container } = renderWithProviders(<SearchPage />, { route: '/search', path: '/search' })
+
+            const results = await axe(container)
+
+            expect(results).toHaveNoViolations()
+        })
+
+        it('le champ de recherche est accessible par son label', () => {
+            renderWithProviders(<SearchPage />, { route: '/search', path: '/search' })
+
+            expect(screen.getByLabelText(/question/i)).toBeInTheDocument()
+        })
     })
 
 
