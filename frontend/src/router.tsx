@@ -5,6 +5,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import NavBar from './shared/ui/NavBar'
 import { papersRoutes } from './features/papers/routes'
 import { ragRoutes } from './features/rag/routes'
+
 function RootLayout() {
     return (
         <>

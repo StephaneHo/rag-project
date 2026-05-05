@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter, Routes, Route } from 'react-router'
 import { render } from '@testing-library/react'
-import type { ReactElement } from 'react'
+import { Suspense, type ReactElement } from 'react'
 
 type Options = {
   route?: string
@@ -19,9 +19,11 @@ export function renderWithProviders(
   return render(
     <QueryClientProvider client={queryClient}>
       <MemoryRouter initialEntries={[route]}>
-        <Routes>
-          <Route path={path} element={ui} />
-        </Routes>
+        <Suspense fallback={<p>Loading test...</p>}>
+          <Routes>
+            <Route path={path} element={ui} />
+          </Routes>
+        </Suspense>
       </MemoryRouter>
     </QueryClientProvider>,
   )
